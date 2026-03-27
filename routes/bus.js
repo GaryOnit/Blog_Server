@@ -84,6 +84,9 @@ router.delete('/:id', async (req, res) => {
 router.get('/', async (req, res, next) => {
   let modelName = req.Model.modelName
   let { options = {}, page = 1, size = 100, query = {}, dis = 8, populate = {} } = req.query
+  page = Number(page)
+  size = Number(size)
+  dis = Number(dis)
   query = qs.parse(query) // 解析查询字符串
 
   // 1. 模糊搜索：如果带有 q 参数，执行标题或内容的全局正则搜索
@@ -105,7 +108,8 @@ router.get('/', async (req, res, next) => {
     let result = await pagination({ model: req.Model, query, options, populate, size, page, dis })
     res.send(200, { message: "ok", data: result })
   } catch (err) {
-    next(createError(422, "获取失败"))
+    console.error('GET列表错误:', err)
+    next(createError(422, err.message || "获取失败"))
   }
 })
 
