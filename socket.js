@@ -13,6 +13,7 @@ let socketIo = require('socket.io')
 let io = socketIo(webSocketServer, { transports: ['websocket'] })
 let { formateDate } = require('./core/util/util')
 
+// [uid, socket] 对每个用户维护一个socket连接
 const users = {}
 
 //处理事件: enterChat, login, send 
@@ -21,7 +22,7 @@ io.on('connection', (socket) => {
   
   //online
   socket.on('online', ({ uid, nickname }) => {
-    if (users[uid]) {
+    if (users[uid] && users[uid].socket.id !== socket.id) {
       users[uid].socket.disconnect()
     }
     users[uid] = {
@@ -36,10 +37,11 @@ io.on('connection', (socket) => {
   //enterChat
   socket.on('enterChat', ({ uid = createTempId(), nickname }) => {
     io.sockets.emit('logged', nickname)
-    //如果已登录用户
+    //如果已登录用户，直接返回
     if (users[uid]) {
       return
     }
+    //如果未登录用户，创建临时的身份信息
     users[uid] = {
       uid,
       nickname,

@@ -33,7 +33,6 @@ router.get('/', async (req, res, next) => {
     userResult = userResult.toJSON()
     userResult.articleCount = articleCount
     userResult.columnCount = columnCount
-    console.log(userResult)
     res.send(200, {
       message: '查询成功',
       data: userResult
