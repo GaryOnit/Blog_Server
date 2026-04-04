@@ -49,7 +49,8 @@ Blog_Server/
 │   ├── getPubKey.js       # 获取公钥路由
 │   ├── upload.js          # 文件上传路由
 │   ├── search.js          # 文章搜索路由
-│   └── artLikes.js        # 文章点赞路由
+│   ├── artLikes.js        # 文章点赞路由
+│   └── ai.js              # AI 对话路由（DeepSeek 流式转发）
 │
 ├── middleware/            # 中间件
 │   └── resource.js        # 资源中间件（动态路由处理）
@@ -88,6 +89,7 @@ Blog_Server/
 - `/keys` - 获取公钥
 - `/articles/search` - 文章搜索
 - `/articles/likes` - 文章点赞
+- `/api/ai/*` - AI 对话（无需登录）
 
 ### 4. 文件上传
 - 最大文件大小：10MB (10240000 bytes)
@@ -134,6 +136,7 @@ npm start  # 使用 nodemon 启动开发服务器
 - `POST /upload` - 文件上传
 - `GET /articles/search` - 文章搜索
 - `POST /articles/likes` - 文章点赞
+- `POST /api/ai/chat` - AI 对话（DeepSeek 流式接口）
 
 ## 数据模型
 
@@ -157,3 +160,17 @@ npm start  # 使用 nodemon 启动开发服务器
 3. 文件上传限制为 10MB
 4. JWT 使用 RS256 算法签名
 5. 所有需要认证的接口都需要在请求头中携带 Token
+6. DeepSeek API Key 存放在 `.env` 文件的 `DEEPSEEK_API_KEY` 变量中，通过 `dotenv` 在 `app.js` 顶部加载，**不得硬编码**
+
+## AI 对话功能
+
+### 接口：`POST /api/ai/chat`
+- **无需 Token**，已加入 JWT unless 白名单
+- **请求体**：
+  ```json
+  { "messages": [...], "articleContext": "<html string>" }
+  ```
+- **响应**：`text/event-stream`，SSE 格式流式透传 DeepSeek 响应
+- `articleContext` 为文章 HTML 原文，后端自动去除标签后截取前 3000 字符注入 system prompt
+- 使用 `axios` 的 `responseType: 'stream'` 实现流式转发，无需额外依赖
+- API Key 从 `process.env.DEEPSEEK_API_KEY` 读取（model: `deepseek-chat`，baseURL: `https://api.deepseek.com`）
