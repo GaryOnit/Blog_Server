@@ -11,6 +11,8 @@ const { maxFileSize } = require('./config')
 const expressJwt = require('express-jwt')
 const { getPublicKeySync } = require('./core/rsaControl')
 
+require('dotenv').config();
+
 require('./socket')
 
 const app = express();
@@ -46,6 +48,7 @@ const uploadRoute = require('./routes/upload')
 const searchRoute = require('./routes/search')
 const artLikesRoute = require('./routes/artLikes');
 const userRoute = require('./routes/user')
+const aiRoute = require('./routes/ai')
 const { send } = require('process');
 
 app.use(expressJwt({
@@ -73,6 +76,7 @@ app.use(expressJwt({
     { url: '/keys' },
     { url: '/articles/search' },
     { url: '/articles/likes' },
+    { url: /\/api\/ai\// },
   ]
 }))
 //首页
@@ -108,6 +112,9 @@ app.use('/articles/search', searchRoute)
 
 //文章点赞
 app.use('/articles/likes', artLikesRoute)
+
+//AI 对话
+app.use('/api/ai', aiRoute)
 
 
 
