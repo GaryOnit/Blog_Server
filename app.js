@@ -37,6 +37,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(path.join(__dirname, 'dist')));
 //中间件  nameMiddleware
 const resourceMiddleware = require('./middleware/resource')
 
@@ -137,6 +138,7 @@ const QUE_MAP = {
   "nickname": "昵称",
   "avatar": "头像"
 }
+
 
 // error handler
 app.use(function (err, req, res, next) {
