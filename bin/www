@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('express-sign:server');
 var http = require('http');
+var initSocket = require('../socket');
+var initSocket = require('../socket');
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +22,9 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+// 将 Socket.IO 挂载到同一个 server，共用同一个端口
+initSocket(server);
 
 /**
  * Listen on provided port, on all network interfaces.
